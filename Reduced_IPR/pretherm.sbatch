@@ -24,5 +24,5 @@
 conda activate /home/admin/.lmg
 export MKL_NUM_THREADS=1
 export OMP_NUM_THREADS=${MKL_NUM_THREADS}
-srun jupyter nbconvert --to notebook --execute prethermalization.ipynb
+srun python prethermalization.py
 conda deactivate
