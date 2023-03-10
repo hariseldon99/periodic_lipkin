@@ -137,8 +137,12 @@ def observables(params, nperiods = 4000):
 
     H0, H1 = get_hamiltonians(N)
     #t=0 Hamiltonian
-    Ht0 = H0 + drive(0, params) * H1
-    en, psi0 = Ht0.groundstate()
+    #Ht0 = H0 + drive(0, params) * H1
+    #en, psi0 = Ht0.groundstate()
+
+    #Typical state is fully spin polarized
+    sx = jmat(N,"x")
+    en, psi0 = sx.groundstate()
 
     psi0_gpu = cp.array(psi0)
 
@@ -189,9 +193,9 @@ def get_ipr(params):
     return ipr
 
 if __name__ == '__main__' :
-    nprocs = 10
+    nprocs = 32
     qutip.settings.num_cpus=nprocs
-    N = 20
+    N = 200
     h0 = np.sqrt(3)
     omega = 90
     

@@ -8,7 +8,7 @@
 #SBATCH --gres=gpu:1
 #This allocates 1 GPU as a Global Resource (gres). Important for GPU jobs
 
-#SBATCH --ntasks=20
+#SBATCH --ntasks=32
 #This sets the number of processes to 1.
 
 #SBATCH --cpus-per-task=1
@@ -20,7 +20,7 @@
 #SBATCH --qos=elevated 
 #This sets the quality of service to 'normal'
 
-#source /usr/local/condaenv/bin/activate
+source /usr/local/condaenv/bin/activate
 conda activate /home/admin/.lmg
 export MKL_NUM_THREADS=1
 export OMP_NUM_THREADS=${MKL_NUM_THREADS}
