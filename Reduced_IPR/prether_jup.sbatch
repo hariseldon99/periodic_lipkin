@@ -14,6 +14,9 @@
 #SBATCH --qos=normal 
 #This sets the quality of service to 'normal'
 
+#SBATCH --mail-type=ALL                                                                              
+#SBATCH --mail-user="telegram:5545394160"                                                  
+
 let nprocs=${SLURM_NTASKS}*${SLURM_CPUS_PER_TASK}
 source /usr/local/condaenv/bin/activate
 conda activate ~/.lmg
