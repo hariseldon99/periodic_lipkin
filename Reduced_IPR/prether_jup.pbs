@@ -1,0 +1,30 @@
+#!/bin/bash
+
+#----------------------------------------------------------
+# Job name
+#PBS -N pretherm
+# queue select
+#PBS -q workq
+# Name of stdout output file (default)
+#PBS -o pretherm.out 
+# stdout output file
+#PBS -j oe
+#PBS -l select=1:mpiprocs=32
+#PBS -l place=scatter
+#PBS -l walltime=12:00:00
+#----------------------------------------------------------
+# Change to submission directory
+cd $PBS_O_WORKDIR
+echo starting
+echo '---------------------------------------------'
+num_proc=`wc -l $PBS_NODEFILE | awk '{print $1}'`
+echo 'num_proc='$num_proc
+echo '---------------------------------------------'
+cat $PBS_NODEFILE
+echo '---------------------------------------------'
+module load cuda
+source /opt/anaconda3/bin/activate hpc
+export MKL_RUN_THREADS=1
+export OMP_NUM_THREADS=${MKL_RUN_THREADS}
+jupyter nbconvert --to notebook --execute prethermalization.ipynb
+conda deactivate
