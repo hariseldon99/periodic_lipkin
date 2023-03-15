@@ -1,26 +1,32 @@
 #!/bin/bash
-#SBATCH --job-name=pythontest
+#SBATCH --job-name=pretherm
 #This sets the name of the job
 
-#SBATCH --ntasks=1
-#This sets the number of processes to 1. Change if needed
+#SBATCH --partition=GPU
+#This sets the partition to the GPU partition. Important for GPU jobs
+
+#SBATCH --gres=gpu:1
+#This allocates 1 GPU as a Global Resource (gres). Important for GPU jobs
+
+#SBATCH --ntasks=32
+#This sets the number of processes to 32. Change if needed
 
 #SBATCH --cpus-per-task=1
 #This allocates the number of cpus per tasks. If the number of tasks is 4, and cpus per task is 1, then slurm will assign 4 X 1 = 4 cpus to the job
 
-#SBATCH --time=00:05:00 
-#This allocates the walltime to 5 minutes. The program will not run for longer.
+#SBATCH --time=48:00:00 
+#This allocates the walltime to 2 day. The program will not run for longer.
 
-#SBATCH --qos=normal 
-#This sets the quality of service to 'normal'
+#SBATCH --qos=elevated 
+#This sets the quality of service to 'elevated'
 
 #SBATCH --mail-type=ALL                                                                              
 #SBATCH --mail-user="telegram:5545394160"                                                  
 
 let nprocs=${SLURM_NTASKS}*${SLURM_CPUS_PER_TASK}
 source /usr/local/condaenv/bin/activate
-conda activate ~/.lmg
-export MKL_RUN_THREADS=$nprocs
+conda activate ~/.hpc
+export MKL_RUN_THREADS=1
 export OMP_NUM_THREADS=${MKL_RUN_THREADS}
-jupyter nbconvert --to notebook --execute notebooks.ipynb
+jupyter nbconvert --to notebook --execute prethermalization.ipynb
 conda deactivate
