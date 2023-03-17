@@ -23,10 +23,22 @@
 #SBATCH --mail-type=ALL                                                                              
 #SBATCH --mail-user="telegram:5545394160"                                                  
 
+#Start time
+start=`date +%s.%N`
+
 let nprocs=${SLURM_NTASKS}*${SLURM_CPUS_PER_TASK}
 source /usr/local/condaenv/bin/activate
 conda activate ~/.hpc
 export MKL_RUN_THREADS=1
 export OMP_NUM_THREADS=${MKL_RUN_THREADS}
-jupyter nbconvert --to notebook --execute prethermalization.ipynb
+#jupyter nbconvert --to notebook --execute prethermalization.ipynb
+nbterm --run prethermalization.ipynb
 conda deactivate
+
+#End time
+end=`date +%s.%N`
+
+RUNTIME=$( echo "$end - $start" | bc -l )
+echo '---------------------------------------------'
+echo "Runtime: "$RUNTIME" sec"
+echo '---------------------------------------------'

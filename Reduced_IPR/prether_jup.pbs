@@ -1,30 +1,56 @@
 #!/bin/bash
-
 #----------------------------------------------------------
 # Job name
-#PBS -N pretherm
+#PBS -N prethermalization
 # queue select
 #PBS -q workq
 # Name of stdout output file (default)
-#PBS -o pretherm.out 
+#PBS -o prethermalization.out 
 # stdout output file
 #PBS -j oe
-#PBS -l select=1:mpiprocs=32
-#PBS -l place=scatter
-#PBS -l walltime=12:00:00
+#PBS -l walltime=00:55:00 
 #----------------------------------------------------------
+# Enter the path to the python script that you wish to run on the GPU node
+IPYNB=prethermalization.ipynb
+
+# Put conda source command in $HOME/.bashrc
+# Create and populate your  conda environment and add the name below
+CONDAENV=hpc
+
+# Enter the name of the GPU host
+#GPUHOST=kuhpcgn1
+GPUHOST=kuhpcgn2
+
+# This is the actual command that the GPU node will run. Adjust as needed
+# Beware the order of the quotes!
+GPUNODE_NTHREADS=1
+GPUNODE_CMD='export OMP_NUM_THREADS='"$GPUNODE_NTHREADS"'; export MKL_NUM_THREADS='"$GPUNODE_NTHREADS"';cd '"$PBS_O_WORKDIR"';conda run -n '"$CONDAENV"' nbterm --run '"$IPYNB"''
+
+#----------------------------------------------------------
+#Suppress spurious infiniband-related errors
+export MPI_MCA_mca_base_component_show_load_errors=0
+export PMIX_MCA_mca_base_component_show_load_errors=0
+
+
 # Change to submission directory
 cd $PBS_O_WORKDIR
-echo starting
+
+echo "Starting Command on GPU Node ${GPUHOST}:"
+echo '---------------------------------------------------------------------------------------------------------------------------------------'
+echo $GPUNODE_CMD
+echo '---------------------------------------------------------------------------------------------------------------------------------------'
+
+#Start time
+start=`date +%s.%N`
+
+SSHBIN=/usr/bin/ssh
+$SSHBIN $GPUHOST $GPUNODE_CMD
+# Kill stray python processes
+$SSHBIN $GPUHOST killall python
+#End time
+end=`date +%s.%N`
+
+RUNTIME=$( echo "$end - $start" | bc -l )
 echo '---------------------------------------------'
-num_proc=`wc -l $PBS_NODEFILE | awk '{print $1}'`
-echo 'num_proc='$num_proc
+echo "Runtime: "$RUNTIME" sec"
 echo '---------------------------------------------'
-cat $PBS_NODEFILE
-echo '---------------------------------------------'
-module load cuda
-source /opt/anaconda3/bin/activate hpc
-export MKL_RUN_THREADS=1
-export OMP_NUM_THREADS=${MKL_RUN_THREADS}
-jupyter nbconvert --to notebook --execute prethermalization.ipynb
-conda deactivate
