@@ -1,3 +1,4 @@
 *slurmrun*
 *.out
 *.h5
+*_run.ipynb

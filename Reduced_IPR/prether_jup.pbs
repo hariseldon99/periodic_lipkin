@@ -1,17 +1,18 @@
 #!/bin/bash
 #----------------------------------------------------------
 # Job name
-#PBS -N prethermalization
+#PBS -N pretherm
 # queue select
 #PBS -q workq
 # Name of stdout output file (default)
-#PBS -o prethermalization.out 
+#PBS -o pretherm.out 
 # stdout output file
 #PBS -j oe
-#PBS -l walltime=00:55:00 
+#PBS -l walltime=24:00:00 
 #----------------------------------------------------------
 # Enter the path to the python script that you wish to run on the GPU node
-IPYNB=prethermalization.ipynb
+#IPYNB=prethermalization.ipynb
+IPYNB=notebooks.ipynb
 
 # Put conda source command in $HOME/.bashrc
 # Create and populate your  conda environment and add the name below
@@ -54,3 +55,21 @@ RUNTIME=$( echo "$end - $start" | bc -l )
 echo '---------------------------------------------'
 echo "Runtime: "$RUNTIME" sec"
 echo '---------------------------------------------'
+
+#----------------------------------------------------------
+# Communicate job status to a telegram bot
+#----------------------------------------------------------
+# Create a telegram bot and get TOKEN, CHATID from telegram botfather: 
+# See https://www.cytron.io/tutorial/how-to-create-a-telegram-bot-get-the-api-key-and-chat-id
+# Put them into two environment variables TOKEN and CHATID in a config file and source itlike below
+#----------------------------------------------------------
+SHBIN=/usr/bin/ssh
+LOGIN_NODE=kuhpchn
+source ${PBS_O_HOME}/.config/telegram/telegram.conf
+
+URL="https://api.telegram.org/bot${TOKEN}/sendMessage"
+# Generate the telegram message  text
+TEXT="${bell} PBS Job ${PBS_JOBNAME} exiting @ ${HOSTNAME}:${PBS_O_WORKDIR}. Job ID: ${PBS_JOBID}"
+CMD='curl -s --max-time 10 --retry 5 --retry-delay 2 --retry-max-time 10  -d '\""chat_id=${CHATID}&text=${TEXT}&disable_web_page_preview=true&parse_mode=markdown"\"" ${URL}"
+$SSHBIN $LOGIN_NODE $CMD 
+#----------------------------------------------------------
