@@ -2,3 +2,4 @@
 *.out
 *.h5
 *_run.ipynb
+pretherm_data
