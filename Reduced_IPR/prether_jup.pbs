@@ -5,7 +5,7 @@
 # queue select
 #PBS -q workq
 # Name of stdout output file (default)
-#PBS -o pretherm.out 
+#PBS -o pretherm_20230329.out 
 # stdout output file
 #PBS -j oe
 #PBS -l walltime=24:00:00 
